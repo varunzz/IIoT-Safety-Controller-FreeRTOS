@@ -8,7 +8,7 @@
 ## 📌 Project Overview
 A fault-tolerant, multithreaded Industrial Internet of Things (IIoT) edge node designed for environmental hazard monitoring and physical mitigation. Built on an ESP32 microcontroller using **FreeRTOS**, this system completely decouples time-critical life-safety hardware interrupts from slower network communications to ensure zero latency during a hazard event.
 
-> **🚀 Live Simulation:** [Click here to run the full hardware and network simulation in your browser via Wokwi] **
+> **🚀 Live Simulation:** [Click the link to run the full hardware and network simulation in your browser via Wokwi] *https://wokwi.com/projects/456845194710339585*
 
 ## ⚙️ Core Architecture & Software Engineering Principles
 This project was built to demonstrate production-grade embedded software practices, specifically targeting thread safety and resource management.
