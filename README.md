@@ -10,6 +10,8 @@ A fault-tolerant, multithreaded Industrial Internet of Things (IIoT) edge node d
 
 > **🚀 Live Simulation:** [Click the link to run the full hardware and network simulation in your browser via Wokwi] *https://wokwi.com/projects/456845194710339585*
 
+📡 Live MQTT Telemetry: While the simulation is running, you can monitor the real-time JSON payload published by the device at broker.hivemq.com — connect to broker.hivemq.com on port 8884 (WebSocket) and subscribe to the topic Project/smarthome/telemetry.
+
 ## ⚙️ Core Architecture & Software Engineering Principles
 This project was built to demonstrate production-grade embedded software practices, specifically targeting thread safety and resource management.
 
