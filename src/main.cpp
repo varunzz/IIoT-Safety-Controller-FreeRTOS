@@ -3,6 +3,7 @@
 #include <freertos/task.h>
 #include <freertos/queue.h>
 #include <freertos/semphr.h>
+#include <esp_task_wdt.h>
 
 // Display, Sensor & Network Libraries
 #include <Wire.h>
@@ -83,6 +84,9 @@ void setup() {
   // Configure MQTT Broker
   mqttClient.setServer(mqtt_server, 1883);
 
+  // Watchdog Timer Setup
+  esp_task_wdt_init(10, true);
+
   // RTOS Setup
   sensorQueue = xQueueCreate(5, sizeof(SensorData));
   displayMutex = xSemaphoreCreateMutex();
@@ -101,6 +105,7 @@ void loop() {}
 
 void TaskReadSensors(void *pvParameters) {
   pinMode(34, INPUT);
+  esp_task_wdt_add(NULL);
   while (1) {
     SensorData currentReadings;
     currentReadings.smokeLevel = analogRead(34); 
@@ -108,14 +113,16 @@ void TaskReadSensors(void *pvParameters) {
     currentReadings.motionDetected = digitalRead(PIR_PIN);
     
     xQueueSend(sensorQueue, &currentReadings, 10);
+    esp_task_wdt_reset(); 
     vTaskDelay(2000 / portTICK_PERIOD_MS); 
   }
 }
 
 void TaskHazardMonitor(void *pvParameters) {
   SensorData receivedData;
+  esp_task_wdt_add(NULL);
   while (1) {
-    if (xQueueReceive(sensorQueue, &receivedData, portMAX_DELAY) == pdPASS) {
+    if (xQueueReceive(sensorQueue, &receivedData, pdMS_TO_TICKS(9000)) == pdPASS) {
       bool alarmFlag = false;
       
       if (receivedData.temperature > 45.0 || receivedData.smokeLevel > 3000) {
@@ -141,14 +148,16 @@ void TaskHazardMonitor(void *pvParameters) {
         currentSystemState.smoke = receivedData.smokeLevel;
         currentSystemState.motion = receivedData.motionDetected;
         currentSystemState.isAlarmActive = alarmFlag;
-        xSemaphoreGive(displayMutex); 
+        xSemaphoreGive(displayMutex);
       }
     }
+    esp_task_wdt_reset();
   }
 }
 
 void TaskUpdateDisplay(void *pvParameters) {
   DisplayState localState;
+  esp_task_wdt_add(NULL);
   while (1) {
     if (xSemaphoreTake(displayMutex, portMAX_DELAY) == pdTRUE) {
       localState = currentSystemState;
@@ -180,6 +189,7 @@ void TaskUpdateDisplay(void *pvParameters) {
     }
 
     display.display(); 
+    esp_task_wdt_reset();
     vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }

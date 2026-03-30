@@ -10,7 +10,7 @@ A fault-tolerant, multithreaded Industrial Internet of Things (IIoT) edge node d
 
 > **🚀 Live Simulation:** [Click the link to run the full hardware and network simulation in your browser via Wokwi] *https://wokwi.com/projects/456845194710339585*
 
-📡 Live MQTT Telemetry: While the simulation is running, you can monitor the real-time JSON payload published by the device at broker.hivemq.com — connect to broker.hivemq.com on port 8884 (WebSocket) and subscribe to the topic Project/smarthome/telemetry.
+**📡 Live MQTT Telemetry:** While the simulation is running, you can monitor the real-time JSON payload published by the device using the [HiveMQ WebSocket Client](https://www.hivemq.com/demos/websocket-client/) — connect on port `8884` and subscribe to the topic `Project/smarthome/telemetry`.
 
 ## ⚙️ Core Architecture & Software Engineering Principles
 This project was built to demonstrate production-grade embedded software practices, specifically targeting thread safety and resource management.
@@ -20,11 +20,13 @@ This project was built to demonstrate production-grade embedded software practic
 * **Resource Synchronization:** Deployed a **Mutex (Semaphore)** to protect the global system state array. This prevents memory corruption when the local OLED display and the Cloud MQTT task attempt to access sensor telemetry simultaneously.
 * **Asynchronous Network Decoupling:** The Wi-Fi and MQTT client run on the lowest priority thread. If the network drops or experiences high latency, the high-priority local hazard detection and physical mitigation (servo dampers, alarms) continue to run flawlessly.
 
+## Fault Tolerance & Reliability
+* **Task Watchdog Timer (TWDT):** Critical tasks monitored with a 10-second hardware watchdog. System auto-resets if any task hangs or deadlocks.
 
 
 ## 🧰 Hardware & Peripherals (Simulated via Wokwi)
 * **ESP32 Core:** Running dual-core FreeRTOS scheduler.
-* **Sensors:** * DHT22 (Digital Temperature & Humidity)
+* **Sensors:** *DHT22 (Digital Temperature & Humidity)
   * PIR Sensor (Digital Motion/Occupancy)
   * Analog Slide Potentiometer (Simulating MQ-Series Gas/Smoke Sensor for fault injection)
 * **Actuators & UI:**
